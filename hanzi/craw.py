@@ -3,6 +3,7 @@
 import requests
 from bs4 import BeautifulSoup
 import ssl
+import zhconv
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -35,7 +36,7 @@ for number in range(2, 27) :
         if len(bushou) > 0  and len(span) > 0:
             #print(bushou[0].text)
             #print(span[0].text)
-            bushou_span[bushou[0].text] = span[0].text
+            bushou_span[zhconv.convert(bushou[0].text, 'zh-cn')] = span[0].text
 
 hanzi = {}
 for bushou in bushou_span.keys():
@@ -49,6 +50,12 @@ for bushou in bushou_span.keys():
             #print(selector_hanzi) 
             rad_result = rad_soup.select(selector_hanzi)
             if len(rad_result) > 0:
-                hanzi[rad_result[0].text] = bushou
+                hanzi[zhconv.convert(rad_result[0].text, 'zh-cn')] = bushou
 print(bushou_span)
 print(hanzi)
+
+hanzi_file = open('../data/bushou.txt', 'w+')
+for key in hanzi.keys():
+    hanzi_file.write(key+ " " + hanzi[key])
+    hanzi_file.write('\n')
+
