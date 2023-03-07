@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 #import zhconv
 
+words_index_file = open('../data/words.txt', 'w+')
 
 for page_num in range(2, 72):
 
@@ -36,4 +37,10 @@ for page_num in range(2, 72):
             word_file = open('../data/words/' + hanzi + '.txt', 'w+')
             word_file.write(hanzi_explain)
             word_file.close()
+
+            words_index_file.write(hanzi)
+            words_index_file.write('\n')
+
+
+words_index_file.close()
 

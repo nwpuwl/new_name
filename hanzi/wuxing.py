@@ -202,5 +202,6 @@ if __name__ == '__main__':
 
     handler_object = MyHandler
     my_server = socketserver.TCPServer(("10.0.0.10", 8000), handler_object)
+    my_server.socket = ssl.wrap_socket(my_server.socket, certfile='../data//server.pem', server_side=True)
     my_server.serve_forever()
 
