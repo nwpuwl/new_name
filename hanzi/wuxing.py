@@ -59,6 +59,8 @@ def loading(book_type):
 
         book_content = open("../data/"+ book_class+ "/" + book_name + ".txt")
 
+        #book_total_content = book_content.readlines()
+        #book_content.seek(0, 0)
 
         for line in book_content:
             strip_line = str.strip(line)
@@ -100,6 +102,7 @@ def loading(book_type):
                     result['book'] = book_name
                     result['wuxing'] = wuxing_result 
                     result['sentiments'] = snow_nlp.sentiments 
+                    result['book_line'] = line 
 
                     words_dic[words] = result 
                     words_list.append(result)
@@ -195,13 +198,13 @@ def Load():
     loading(3)
     loading(4)
     loading(5)
-    print(result_dict)
+    #print(result_dict)
 
 if __name__ == '__main__':
     Load()
 
     handler_object = MyHandler
     my_server = socketserver.TCPServer(("10.0.0.10", 8000), handler_object)
-    my_server.socket = ssl.wrap_socket(my_server.socket, certfile='../data//server.pem', server_side=True)
+    #my_server.socket = ssl.wrap_socket(my_server.socket, certfile='../data//server.pem', server_side=True)
     my_server.serve_forever()
 
