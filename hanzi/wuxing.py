@@ -38,7 +38,10 @@ words_list = []
 #五行严格顺序
 result_dict = {}
 
-
+# book_id:{}
+book_id_content = {}
+# book_hanyi:{}
+book_id_hanyi = {}
 
 def loading(book_type):
     if book_type == 1:
@@ -53,14 +56,22 @@ def loading(book_type):
         book_class = 'songci'
     else :
         return(0)
-    book_title = open("../data/"+book_class+"_title.txt")
 
+    book_title = open("../data/"+book_class+"_title.txt")
     for book in book_title:
         book_name = book.split(' ')[1]
         book_id = book_class+"_"+book.split(' ')[0]
-        book_content = open("../data/"+ book_class+ "/" + book_name + ".txt")
 
+        # 文章译文
+        book_hanyi = open("../data/" + book_class + "/" + book_id + ".txt", "r+")
+        #print(book_id, book_hanyi)
+        book_id_hanyi[book_id] = book_hanyi.readlines()
+        book_hanyi.close()
 
+        # 文章全文
+        book_content = open("../data/"+ book_class+ "/" + book_id + "_content"+ ".txt")
+        book_id_content[book_id] = book_content.readlines()
+        book_content.seek(0)
         for line in book_content:
             strip_line = str.strip(line)
             ss = list(strip_line)
@@ -185,35 +196,72 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 
         # 输入串处理
         path = self.path
-        req_list  = path.split('/')
-        req_param = {}
-        if len(req_list) > 1:
-            req = req_list[1].split('&')
-            for str_param in req:
-                param = str_param.split('=')
-                if len(param) > 1:
-                    req_param[param[0]] = urllib.parse.unquote(param[1])
-        print(req_param)
-
-        if ('wuxing' in req_param and 
-                'first_name' in req_param and 
-                'gender' in req_param):
-            result = FindNameList(req_param['wuxing'], req_param['first_name'],
-                    req_param['gender'])
-            data = {
-            }
-            data['result'] = result 
-            json_data = json.dumps(data, ensure_ascii=False)
-
-            #print("json_data: " +json_data + ", result:" + str(result) + ", data: " + str(data))
+        req_list = path.split('/')[1].split('?')[0]
+        if (req_list == "wuxing") :
+            json_data  = ProcWuxing(path)
+            self.wfile.write(json_data.encode())
+        elif (req_list == "content_detail") :
+            json_data  = ContentDetail(path)
             self.wfile.write(json_data.encode())
         else :
             data = {
-                 "error": "invalid param"
+                "error": "invalid param"
                 }
-
-            json_data = json.dumps(data)
+            json_data = json.dumps(data, ensure_ascii=False)
             self.wfile.write(json_data.encode())
+
+def ContentDetail(path):
+    req_list  = path.split('?')
+    req_param = {}
+    if len(req_list) > 1:
+        req = req_list[1].split('&')
+        for str_param in req:
+            param = str_param.split('=')
+            if len(param) > 1:
+                req_param[param[0]] = urllib.parse.unquote(param[1])
+
+    data = {}
+    if ('book_id' in req_param ):
+        book_id = req_param['book_id']
+        book_class = book_id.split('_')
+        data["hanyi"] = book_id_hanyi[book_id]
+        data["raw_content"] = book_id_content[book_id]
+    else :
+        data = {
+             "error": "invalid param"
+            }
+
+    json_data = json.dumps(data, ensure_ascii=False)
+    return json_data
+
+
+def ProcWuxing(path) :
+    req_list  = path.split('?')
+    req_param = {}
+    if len(req_list) > 1:
+        req = req_list[1].split('&')
+        for str_param in req:
+            param = str_param.split('=')
+            if len(param) > 1:
+                req_param[param[0]] = urllib.parse.unquote(param[1])
+
+    if ('wuxing' in req_param and 
+            'first_name' in req_param and 
+            'gender' in req_param):
+        result = FindNameList(req_param['wuxing'], req_param['first_name'],
+                req_param['gender'])
+        data = {
+        }
+        data['result'] = result 
+        #json_data = json.dumps(data, ensure_ascii=False)
+    else :
+        data = {
+             "error": "invalid param"
+            }
+
+    json_data = json.dumps(data, ensure_ascii=False)
+    return json_data
+
 
 def FindNameList(str_wuxing, first_name, gender):
     name = [] 

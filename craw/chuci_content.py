@@ -27,7 +27,7 @@ for line in title :
     content_tile = open(content_file_name, "w+")
 
     file_content = result[0].text
-    content_tile.write(file_content[2:])
+    content_tile.write("译文：" + file_content[2:])
     content_tile.write("\n")
 
     print(content_file_name)
