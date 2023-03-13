@@ -56,13 +56,10 @@ def loading(book_type):
     book_title = open("../data/"+book_class+"_title.txt")
 
     for book in book_title:
-        book_name = book.split(' ')[0]
-        #print(book_name)
-
+        book_name = book.split(' ')[1]
+        book_id = book_class+"_"+book.split(' ')[0]
         book_content = open("../data/"+ book_class+ "/" + book_name + ".txt")
 
-        #book_total_content = book_content.readlines()
-        #book_content.seek(0, 0)
 
         for line in book_content:
             strip_line = str.strip(line)
@@ -71,10 +68,10 @@ def loading(book_type):
                 continue
             for number in range(0, len(ss)):
                 end_number = min(number+10, len(ss))
-                if (ss[number] == '，' or ss[number] == '。' or ss[number] == '！' or ss[number] == '；') :
+                if (ss[number] == '，' or ss[number] == '。' or ss[number] == '！' or ss[number] == '；' or ss[number] == '？'):
                     continue
                 for back in range(number+1, end_number):
-                    if (ss[back] == '，' or ss[back] == '。' or ss[number] == '！' or ss[number] == '；'):
+                    if (ss[back] == '，' or ss[back] == '。' or ss[back] == '！' or ss[back] == '；' or ss[back] == '？'):
                         continue
                     if (ss[number] == ss[back]) :
                         continue
@@ -107,6 +104,7 @@ def loading(book_type):
                     result['sentiments'] = snow_nlp.sentiments 
                     result['book_line'] = line 
                     result['gender'] = guess_gender[0]
+                    result['book_id'] = book_id
 
                     words_dic[words] = result 
                     words_list.append(result)
