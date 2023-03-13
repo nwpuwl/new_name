@@ -1,0 +1,1 @@
+way, road, path, journey; course

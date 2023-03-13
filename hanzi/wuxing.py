@@ -13,6 +13,7 @@ import socketserver
 import json
 import ngender
 import random
+import os
 
 
 
@@ -42,6 +43,9 @@ result_dict = {}
 book_id_content = {}
 # book_hanyi:{}
 book_id_hanyi = {}
+
+# words_dictionary
+words_dictionary={}
 
 def loading(book_type):
     if book_type == 1:
@@ -203,12 +207,37 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
         elif (req_list == "content_detail") :
             json_data  = ContentDetail(path)
             self.wfile.write(json_data.encode())
+        elif (req_list == "words_dictionary") :
+            json_data  = WordsDictionary(path)
+            self.wfile.write(json_data.encode())
         else :
             data = {
                 "error": "invalid param"
                 }
             json_data = json.dumps(data, ensure_ascii=False)
             self.wfile.write(json_data.encode())
+
+def WordsDictionary(path):
+    req_list  = path.split('?')
+    req_param = {}
+    if len(req_list) > 1:
+        req = req_list[1].split('&')
+        for str_param in req:
+            param = str_param.split('=')
+            if len(param) > 1:
+                req_param[param[0]] = urllib.parse.unquote(param[1])
+
+    data = {}
+    if ('words1' in req_param and 'words2' in req_param):
+        data["words1"] = words_dictionary[req_param['words1']]
+        data["words2"] = words_dictionary[req_param['words2']]
+    else :
+        data = {
+             "error": "invalid param"
+            }
+
+    json_data = json.dumps(data, ensure_ascii=False)
+    return json_data
 
 def ContentDetail(path):
     req_list  = path.split('?')
@@ -313,15 +342,21 @@ def FindNameList(str_wuxing, first_name, gender):
                 name.append(words_list[list_index])
     return(name)
 
+def LoadWordDictionary():
+    for file_name in os.listdir("../data/words/"):
+        word = file_name.split(".")[0]
+        word_content = open("../data/words/"+file_name, 'r+')
+        words_dictionary[word] = word_content.readlines()
 
 def Load():
+    LoadWordDictionary()
+
     loading(1)
     loading(2)
     loading(3)
     loading(4)
     loading(5)
     print("loading done")
-    #print(result_dict)
 
 if __name__ == '__main__':
     Load()

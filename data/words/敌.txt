@@ -1,0 +1,1 @@
+enemy, foe, rival; resist
