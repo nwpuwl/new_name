@@ -489,8 +489,9 @@ def SanCai(path) :
             if len(param) > 1:
                 req_param[param[0]] = urllib.parse.unquote(param[1])
 
-        if ('first_name' in req_param):
-            result = ProcSanCai(req_param['first_name'])
+        if ('first_name' in req_param and 
+                'gender' in req_param):
+            result = ProcSanCai(req_param['first_name'], req_param['gender'])
             data = {}
             data['result'] = result 
     else :
@@ -501,16 +502,20 @@ def SanCai(path) :
     json_data = json.dumps(data, ensure_ascii=False)
     return json_data
 
-def ProcSanCai(first_name) :
+def ProcSanCai(first_name, gender) :
     name = []
     index = 0
+    if (gender != "male" and gender != "female") :
+        return(name)
+
     for words in words_list: 
         #print("ProcSanCai:" + str(words[words]))
         sancai_result = CacuSancai(first_name, words['words'])
         if '凶' in sancai_result['result']:
-            #print(first_name + words['words'] + ": " + str(sancai_result))
             continue
         else :
+            if (words["gender"] != gender):
+                continue
             words["result"] = sancai_result
             name.append(words)
             index = index + 1
