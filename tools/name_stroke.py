@@ -2,9 +2,6 @@
 
 import zhconv
 
-
-
-
 sancai_wuxing_dict = dict()
 def LoadSancai():
     """
@@ -140,5 +137,5 @@ if __name__ == "__main__":
 
     LoadingKangxi()
     LoadSancai()
-    CacuSancai("王", "中磊")
+    CacuSancai("王", "爽行")
 
