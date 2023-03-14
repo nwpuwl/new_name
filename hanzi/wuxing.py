@@ -43,6 +43,10 @@ result_dict = {}
 book_id_content = {}
 # book_hanyi:{}
 book_id_hanyi = {}
+# book_id_name:{}
+book_id_name = {}
+# book_id_class:{}
+book_id_class = {}
 
 # words_dictionary
 words_dictionary={}
@@ -66,9 +70,12 @@ def loading(book_type):
         book_name = book.split(' ')[1]
         book_id = book_class+"_"+book.split(' ')[0]
 
+        # book name
+        book_id_name[book_id] = book_name
+        # book_class
+        book_id_class[book_id] = book_class
         # 文章译文
         book_hanyi = open("../data/" + book_class + "/" + book_id + ".txt", "r+")
-        #print(book_id, book_hanyi)
         book_id_hanyi[book_id] = book_hanyi.readlines()
         book_hanyi.close()
 
@@ -253,8 +260,10 @@ def ContentDetail(path):
     if ('book_id' in req_param ):
         book_id = req_param['book_id']
         book_class = book_id.split('_')
-        data["hanyi"] = book_id_hanyi[book_id]
+        data["book_name"] = book_id_name[book_id]
+        data["book_class"] = book_id_class[book_id]
         data["raw_content"] = book_id_content[book_id]
+        data["hanyi"] = book_id_hanyi[book_id]
     else :
         data = {
              "error": "invalid param"
